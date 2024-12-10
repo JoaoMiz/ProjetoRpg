@@ -1,7 +1,7 @@
-package com.example.Rpg_Marnes.repository;
+// package com.example.Rpg_Marnes.repository;
 
-import org.springframework.data.jpa.repository.JpaRepository;
-import com.example.Rpg_Marnes.model.Monstro;
+// import org.springframework.data.jpa.repository.JpaRepository;
+// import com.example.Rpg_Marnes.model.Monstro;
 
-public interface MonstroRepository extends JpaRepository<Monstro, Long>{
-}
+// public interface MonstroRepository extends JpaRepository<Monstro, Long>{
+// }

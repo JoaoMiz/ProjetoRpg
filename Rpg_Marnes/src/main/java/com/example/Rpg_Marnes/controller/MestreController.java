@@ -15,7 +15,6 @@ public class MestreController {
         this.mestreService = mestreService;
     }
 
-    // Endpoint para rolar dados
     @PostMapping("/rolagem")
     public int rolarDados(
             @RequestParam int numLados,@RequestParam int qntDados,@RequestParam int bonus
