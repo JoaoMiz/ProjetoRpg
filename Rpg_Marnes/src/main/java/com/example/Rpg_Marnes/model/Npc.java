@@ -1,17 +1,11 @@
-package com.example.Rpg_Marnes.model;
-import java.util.List;
-import jakarta.persistence.*;
-import lombok.Data;
+// package com.example.Rpg_Marnes.model;
 
-@Data
-@Entity
-public class Npc extends Ficha {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)  // Geração automática do ID
-    private Long id;
+// import lombok.Data;
 
-    private List<String> inventario;
-    private int xp;
+// import java.util.List;
 
-    // Getters e setters
-}
+// @Data
+// public class Npc extends Ficha {
+//     private List<String> inventario;
+//     private int xp;
+// }
