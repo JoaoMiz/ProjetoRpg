@@ -16,10 +16,6 @@ public class Mestre {
     @Column(nullable = false)
     private String senha;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "ficha_id", referencedColumnName = "id")
-    private Ficha ficha; 
-
     
     public Long getId() {
         return id;
