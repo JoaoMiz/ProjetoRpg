@@ -6,6 +6,7 @@ import java.util.List;
 
 @Data
 public class Ficha {
+    private Long id;
     private int vida;
     private int ca;
     private int sg;
