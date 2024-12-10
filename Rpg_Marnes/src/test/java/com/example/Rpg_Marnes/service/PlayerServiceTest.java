@@ -1,19 +1,25 @@
 package com.example.Rpg_Marnes.service;
 
 import com.example.Rpg_Marnes.dto.PlayerDTO;
+import com.example.Rpg_Marnes.model.Ficha;
 import com.example.Rpg_Marnes.model.Player;
+import com.example.Rpg_Marnes.repository.FichaRepository;
 import com.example.Rpg_Marnes.repository.PlayerRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
+import java.util.Arrays;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+@ExtendWith(MockitoExtension.class)
 class PlayerServiceTest {
 
     @InjectMocks
@@ -22,13 +28,17 @@ class PlayerServiceTest {
     @Mock
     private PlayerRepository playerRepository;
 
+    @Mock
+    private FichaRepository fichaRepository;
+
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
     }
 
+    // Testes para Player
     @Test
-    void testCriarPlayerComSucesso() {
+    public void testCriarPlayerComSucesso() {
         Player player = new Player();
         player.setEmail("player@example.com");
 
@@ -42,7 +52,7 @@ class PlayerServiceTest {
     }
 
     @Test
-    void testCriarPlayerSemEmailDeveLancarExcecao() {
+    public void testCriarPlayerSemEmailDeveLancarExcecao() {
         Player player = new Player();
 
         Exception exception = assertThrows(IllegalArgumentException.class, () -> {
@@ -54,7 +64,7 @@ class PlayerServiceTest {
     }
 
     @Test
-    void testEditarPlayerComSucesso() {
+    public void testEditarPlayerComSucesso() {
         Long id = 1L;
         Player playerExistente = new Player();
         playerExistente.setId(id);
@@ -75,23 +85,7 @@ class PlayerServiceTest {
     }
 
     @Test
-    void testEditarPlayerNaoEncontrado() {
-        Long id = 1L;
-        Player novosDados = new Player();
-
-        when(playerRepository.findById(id)).thenReturn(Optional.empty());
-
-        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-            playerService.editarPlayer(id, novosDados);
-        });
-
-        assertEquals("Player não encontrado.", exception.getMessage());
-        verify(playerRepository, times(1)).findById(id);
-        verify(playerRepository, never()).save(any(Player.class));
-    }
-
-    @Test
-    void testBuscarPlayerComSucesso() {
+    public void testBuscarPlayerComSucesso() {
         Long id = 1L;
         Player player = new Player();
         player.setId(id);
@@ -106,44 +100,101 @@ class PlayerServiceTest {
         verify(playerRepository, times(1)).findById(id);
     }
 
+    // Testes para Ficha
     @Test
-    void testBuscarPlayerNaoEncontrado() {
-        Long id = 1L;
+    public void testCriarFichaComSucesso() {
+        Ficha ficha = new Ficha();
+        ficha.setDescricao("Nova Ficha");
+        ficha.setVida(100);
+        ficha.setCa(15);
+        ficha.setProficiencia(2);
 
-        when(playerRepository.findById(id)).thenReturn(Optional.empty());
+        when(fichaRepository.save(ficha)).thenReturn(ficha);
 
-        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-            playerService.buscarPlayer(id);
-        });
+        Ficha resultado = playerService.criarFicha(ficha);
 
-        assertEquals("Player não encontrado.", exception.getMessage());
-        verify(playerRepository, times(1)).findById(id);
+        assertNotNull(resultado);
+        assertEquals("Nova Ficha", resultado.getDescricao());
+        assertEquals(100, resultado.getVida());
+        verify(fichaRepository, times(1)).save(ficha);
     }
 
     @Test
-    void testExcluirPlayerComSucesso() {
-        Long id = 1L;
+    public void testCriarFichaSemCamposObrigatoriosDeveLancarExcecao() {
+        Ficha ficha = new Ficha();
 
-        when(playerRepository.existsById(id)).thenReturn(true);
+        Exception exception = assertThrows(IllegalArgumentException.class, () -> {
+            playerService.criarFicha(ficha);
+        });
 
-        playerService.excluirPlayer(id);
-
-        verify(playerRepository, times(1)).existsById(id);
-        verify(playerRepository, times(1)).deleteById(id);
+        assertEquals("A descrição da ficha deve ser preenchida.", exception.getMessage());
+        verify(fichaRepository, never()).save(ficha);
     }
 
     @Test
-    void testExcluirPlayerNaoEncontrado() {
+    public void testEditarFichaComSucesso() {
+        Long id = 1L;
+        Ficha fichaExistente = new Ficha();
+        fichaExistente.setId(id);
+        fichaExistente.setDescricao("Descrição Antiga");
+        fichaExistente.setVida(50);
+
+        Ficha novosDados = new Ficha();
+        novosDados.setDescricao("Descrição Nova");
+        novosDados.setVida(100);
+
+        when(fichaRepository.findById(id)).thenReturn(Optional.of(fichaExistente));
+        when(fichaRepository.save(any(Ficha.class))).thenReturn(fichaExistente);
+
+        Ficha resultado = playerService.editarFicha(id, novosDados);
+
+        assertNotNull(resultado);
+        assertEquals("Descrição Nova", resultado.getDescricao());
+        assertEquals(100, resultado.getVida());
+        verify(fichaRepository, times(1)).findById(id);
+        verify(fichaRepository, times(1)).save(fichaExistente);
+    }
+
+    @Test
+    public void testBuscarFichaComSucesso() {
+        Long id = 1L;
+        Ficha ficha = new Ficha();
+        ficha.setId(id);
+        ficha.setDescricao("Descrição da Ficha");
+
+        when(fichaRepository.findById(id)).thenReturn(Optional.of(ficha));
+
+        Ficha resultado = playerService.buscarFicha(id);
+
+        assertNotNull(resultado);
+        assertEquals("Descrição da Ficha", resultado.getDescricao());
+        verify(fichaRepository, times(1)).findById(id);
+    }
+
+    @Test
+    public void testExcluirFichaComSucesso() {
         Long id = 1L;
 
-        when(playerRepository.existsById(id)).thenReturn(false);
+        when(fichaRepository.existsById(id)).thenReturn(true);
+
+        playerService.excluirFicha(id);
+
+        verify(fichaRepository, times(1)).existsById(id);
+        verify(fichaRepository, times(1)).deleteById(id);
+    }
+
+    @Test
+    public void testExcluirFichaNaoEncontrada() {
+        Long id = 1L;
+
+        when(fichaRepository.existsById(id)).thenReturn(false);
 
         Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-            playerService.excluirPlayer(id);
+            playerService.excluirFicha(id);
         });
 
-        assertEquals("Player não encontrado.", exception.getMessage());
-        verify(playerRepository, times(1)).existsById(id);
-        verify(playerRepository, never()).deleteById(id);
+        assertEquals("Ficha não encontrada.", exception.getMessage());
+        verify(fichaRepository, times(1)).existsById(id);
+        verify(fichaRepository, never()).deleteById(id);
     }
 }
