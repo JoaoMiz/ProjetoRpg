@@ -48,7 +48,7 @@ public class FichaController {
     }
 
     // Deletar uma ficha por ID
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/deletarFicha/{id}")
     public ResponseEntity<Void> deleteFicha(@PathVariable Long id) {
         fichaService.deleteFicha(id);
         return ResponseEntity.noContent().build();
