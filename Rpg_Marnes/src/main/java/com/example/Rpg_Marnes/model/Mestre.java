@@ -1,8 +1,5 @@
 package com.example.Rpg_Marnes.model;
 
-import java.util.List;
-
-import com.example.Rpg_Marnes.repository.FichaRepository;
 
 import jakarta.persistence.*;
 import lombok.Data;
