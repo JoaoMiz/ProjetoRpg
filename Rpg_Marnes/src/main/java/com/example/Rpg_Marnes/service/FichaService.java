@@ -1,37 +1,18 @@
 package com.example.Rpg_Marnes.service;
 
 import com.example.Rpg_Marnes.model.Ficha;
-import com.example.Rpg_Marnes.model.Monstro;
-import com.example.Rpg_Marnes.model.Npc;
-import com.example.Rpg_Marnes.repository.MonstroRepository;
-import com.example.Rpg_Marnes.repository.NpcRepository;
+import com.example.Rpg_Marnes.repository.FichaRepository;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Random;
+import java.util.Optional;
+
 
 @Service
 public class FichaService {
-   Random random = new Random();
 
-   @Autowired
-   private NpcRepository npcRepository;
-
-   @Autowired
-   private MonstroRepository monstroRepository;
-
-   public List<Npc> findAllNpc(){return npcRepository.findAll();}
-
-   public List<Monstro> findAllMonstro(){return monstroRepository.findAll();}
-
-   public Npc findNpcById(Long id){
-       return npcRepository.findById(id).orElseThrow(() -> new RuntimeException("Ficha não encontrado"));
-   }
-
-   public Ficha findMonstroById(Long id){
-       return npcRepository.findById(id).orElseThrow(() -> new RuntimeException("Monstro não encontrado"));
-   }
 
 /*    public List<Integer> rolagem(int numLados, int qntDados, int bonus){
        List<Integer> resultado = List.of();
@@ -43,47 +24,50 @@ public class FichaService {
        }
    }*/
 
-   public int rolagem(int numLados, int qntDados, int bonus){
-       int randomInt = random.nextInt(numLados);
-       int resultado = randomInt+bonus;
-       System.out.println("Resultado: " + randomInt + " " + bonus);
-       return resultado;
-   }
+    @Autowired
+    private FichaRepository fichaRepository;
 
-   public Npc npcIniciativa(){
-       Npc npc = new Npc();
 
-       npc.setIniciativa(rolagem(20,1,0));
-       return npcRepository.save(npc);
-   }
+    // Criação ou atualização de uma ficha
+    public Ficha saveFicha(Ficha ficha) {
+        return fichaRepository.save(ficha);
+    }
 
-   public Monstro MonstroIniciativa(){
-       Monstro monstro = new Monstro();
+    // Obter todas as fichas
+    public List<Ficha> getAllFichas() {
+        return fichaRepository.findAll();
+    }
 
-       monstro.setIniciativa(rolagem(20,1,0));
-       return monstroRepository.save(monstro);
-   }
+    // Obter uma ficha por ID
+    public Optional<Ficha> getFichaById(Long id) {
+        return fichaRepository.findById(id);
+    }
 
-   public Npc criarNpc(Npc npc){return npcRepository.save(npc);}
+    // Deletar uma ficha por ID
+    public void deleteFicha(Long id) {
+        fichaRepository.deleteById(id);
+    }
 
-   public void deletarNpc(Long id){
-       Npc npc = new Npc();
-       npcRepository.delete(npc);
-   }
-
-   public void deletarMonstro(Long id){
-       Monstro monstro = new Monstro();
-       monstroRepository.delete(monstro);
-   }
-
-   public Monstro criarMonstro(Monstro monstro){return monstroRepository.save(monstro);}
-
-   public Npc adicionarItem(Long id, String item){
-       Npc npc = findNpcById(id);
-       List<String> invent = npc.getInventario();
-       invent.add(item);
-       npc.setInventario(invent);
-       return npcRepository.save(npc);
-   }
+    public Ficha updateFicha(Long id, Ficha fichaDetails) {
+        // Verifica se a ficha existe
+        Optional<Ficha> fichaOptional = fichaRepository.findById(id);
+        if (fichaOptional.isPresent()) {
+            Ficha ficha = fichaOptional.get();
+            // Atualiza os campos da ficha com os dados fornecidos
+            ficha.setVida(fichaDetails.getVida());
+            ficha.setCa(fichaDetails.getCa());
+            ficha.setSg(fichaDetails.getSg());
+            ficha.setIniciativa(fichaDetails.getIniciativa());
+            ficha.setDeslocamento(fichaDetails.getDeslocamento());
+            ficha.setDescricao(fichaDetails.getDescricao());
+            ficha.setProficiencia(fichaDetails.getProficiencia());
+            // Salva as mudanças
+            return fichaRepository.save(ficha);
+        } else {
+            
+            return null; 
+        }
+    }
+   
 
 }

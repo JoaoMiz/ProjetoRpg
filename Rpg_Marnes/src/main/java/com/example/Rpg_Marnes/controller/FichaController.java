@@ -2,15 +2,15 @@ package com.example.Rpg_Marnes.controller;
 
 
 import com.example.Rpg_Marnes.model.Ficha;
-import com.example.Rpg_Marnes.model.Monstro;
-import com.example.Rpg_Marnes.model.Npc;
 import com.example.Rpg_Marnes.service.FichaService;
-import org.apache.tomcat.util.modeler.modules.ModelerSource;
+
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/ficha")
@@ -20,39 +20,48 @@ public class FichaController {
    @Autowired
    private FichaService fichaService;
 
-   @GetMapping("/npc")
-   public List<Npc> getAllNpc(){return fichaService.findAllNpc();}
 
-   @GetMapping("/monstro")
-   public List<Monstro> getAllMonstro(){return fichaService.findAllMonstro();}
+    @Autowired
+    public FichaController(FichaService fichaService) {
+        this.fichaService = fichaService;
+    }
 
-   @PutMapping("/rolagem/{numLados}/{qntDados}/{bonus}")
-   public void rolagem(@PathVariable int numLados, @PathVariable int qntDados, @PathVariable int bonus){
-       fichaService.rolagem(numLados,qntDados,bonus);
-   }
+    // Criar ou atualizar uma ficha
+    @PostMapping
+    public ResponseEntity<Ficha> createFicha(@RequestBody Ficha ficha) {
+        Ficha savedFicha = fichaService.saveFicha(ficha);
+        return ResponseEntity.ok(savedFicha);
+    }
 
-   @PutMapping("/npc/{id}/iniciativa")
-   public Npc setIniciativaNpc(@PathVariable Long id){return fichaService.npcIniciativa();}
+    // Obter todas as fichas
+    @GetMapping
+    public ResponseEntity<List<Ficha>> getAllFichas() {
+        List<Ficha> fichas = fichaService.getAllFichas();
+        return ResponseEntity.ok(fichas);
+    }
 
-   @PutMapping("/monstro/{id}/iniciativa")
-   public Monstro setIniciativaMonstro(@PathVariable Long id){
-       return fichaService.MonstroIniciativa();
-   }
+    // Obter uma ficha por ID
+    @GetMapping("/{id}")
+    public ResponseEntity<Ficha> getFichaById(@PathVariable Long id) {
+        Optional<Ficha> ficha = fichaService.getFichaById(id);
+        return ficha.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+    }
 
-   @PutMapping("/{id}/invent")
-   public Npc setInventario(@RequestBody String invent, @PathVariable Long id){
-       return fichaService.adicionarItem(id,invent);
-   }
+    // Deletar uma ficha por ID
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteFicha(@PathVariable Long id) {
+        fichaService.deleteFicha(id);
+        return ResponseEntity.noContent().build();
+    }
 
-   @DeleteMapping("monstro/{id}")
-   public ResponseEntity<Void> apagarMonstro(@PathVariable Long id){
-       fichaService.deletarMonstro(id);
-       return ResponseEntity.noContent().build();
-   }
-
-   @DeleteMapping("npc/{id}")
-   public ResponseEntity<Void> apagarNpc(@PathVariable Long id) {
-       fichaService.deletarNpc(id);
-       return ResponseEntity.noContent().build();
-   }
+    // Atualizar uma ficha
+    @PutMapping("/{id}")
+    public ResponseEntity<Ficha> updateFicha(@PathVariable Long id, @RequestBody Ficha fichaDetails) {
+        Ficha updatedFicha = fichaService.updateFicha(id, fichaDetails);
+        if (updatedFicha != null) {
+            return ResponseEntity.ok(updatedFicha);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
 }
