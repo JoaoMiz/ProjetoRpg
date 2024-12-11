@@ -21,6 +21,8 @@ public class MestreService {
     private MonstroRepository monstroRepository;
     private NpcRepository npcRepository;
     private FichaRepository fichaRepository;
+    @Autowired
+    private ChatService chatService;
 
     // Construtor com injeção de dependências
     @Autowired
@@ -32,9 +34,19 @@ public class MestreService {
 
     public int rolarDados(int numLados, int qntDados, int bonus) {
         int resultado = bonus;
+        StringBuilder mensagem = new StringBuilder("Rolagem de Dados: ");
+        
         for (int i = 0; i < qntDados; i++) {
-            resultado += (int) (Math.random() * numLados) + 1; // Gera números entre 1 e numLados
+            int roll = (int) (Math.random() * numLados) + 1; // Gera um número entre 1 e numLados
+            resultado += roll;
+            mensagem.append("D" + numLados + " = " + roll + " ");
         }
+        
+        
+        mensagem.append("+ Bônus: " + bonus + " = Total: " + resultado);
+        
+    
+        chatService.AdicionarMensagem(mensagem.toString());
 
         return resultado;
     }
